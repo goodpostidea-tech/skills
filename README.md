@@ -27,6 +27,20 @@ npx @goodpostidea-tech/skills add https://github.com/goodpostidea-tech/skills --
 npx @goodpostidea-tech/skills add https://github.com/owner/repo --skill my-skill --branch master
 ```
 
+## Repo structure
+
+Skills are under the `skills/` directory (same convention as baoyu-skills and vercel-labs/skills):
+
+```
+skills/
+├── cli.js           # Installer CLI
+├── package.json
+├── README.md
+└── skills/          # Skill modules
+    └── you-skills/
+        └── SKILL.md
+```
+
 ## Skills in this repo
 
 | Skill       | Description |

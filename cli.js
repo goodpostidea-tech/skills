@@ -95,9 +95,18 @@ async function main() {
     await extract(zipPath, { dir: extractDir });
     const topDir = fs.readdirSync(extractDir)[0];
     if (!topDir) throw new Error('Archive is empty');
-    const skillSrc = path.join(extractDir, topDir, skillName);
+    const root = path.join(extractDir, topDir);
+    // Prefer skills/<name> (convention), then <name> at repo root
+    let skillSrc = path.join(root, 'skills', skillName);
     if (!fs.existsSync(skillSrc)) {
-      throw new Error(`Skill "${skillName}" not found in repo. Available: ${fs.readdirSync(path.join(extractDir, topDir)).join(', ')}`);
+      skillSrc = path.join(root, skillName);
+    }
+    if (!fs.existsSync(skillSrc)) {
+      const inSkills = fs.existsSync(path.join(root, 'skills'))
+        ? fs.readdirSync(path.join(root, 'skills')).join(', ')
+        : '(no skills/ folder)';
+      const atRoot = fs.readdirSync(root).filter((n) => n !== 'skills').join(', ');
+      throw new Error(`Skill "${skillName}" not found. Under skills/: ${inSkills}. At root: ${atRoot}`);
     }
     const skillDest = path.join(targetDir, skillName);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
