@@ -1,6 +1,8 @@
 # skills
 
-Open-source skills for Cursor / Codex. You can install any skill from this repo into your local skills directory.
+> English | [简体中文](./README.zh.md)
+
+CLI to **install skills from any GitHub repo** into your local agent directories. When you run `add`, you choose **which agents to install to** (Cursor, Codex, OpenClaw, .agents, Claude Code, etc.) via an interactive checkbox. This repo also hosts open-source skills (e.g. you-skills) that you can install with the same CLI.
 
 ## Install a skill
 
