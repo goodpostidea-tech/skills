@@ -2,28 +2,37 @@
 
 /**
  * skills add <repo-url> [--skill <name>] [--target <dir>] [--dry-run]
- * Install a skill into local skills directories. By default installs to all
- * known roots (Cursor, Codex, OpenClaw, .agents) so the skill works in any tool.
+ * Install a skill into local skills directories. With TTY, prompts to choose
+ * which agents to install to; otherwise installs to all known roots.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { checkbox } from '@inquirer/prompts';
 import extract from 'extract-zip';
 
 const DEFAULT_BRANCH = 'main';
 
-/** All known skill roots so the skill works in Cursor, Codex, OpenClaw, Claude Code, etc. */
-function getDefaultSkillRoots() {
+/** Agent display name -> absolute skills path (env-aware). */
+function getAgentChoices() {
   const home = os.homedir();
-  const roots = [];
-  const codexHome = process.env.CODEX_HOME || path.join(home, '.codex');
-  roots.push(path.join(codexHome, 'skills'));
-  const cursorHome = process.env.CURSOR_HOME || path.join(home, '.cursor');
-  roots.push(path.join(cursorHome, 'skills'));
-  roots.push(path.join(home, '.openclaw', 'skills'));
-  roots.push(path.join(home, '.agents', 'skills'));
-  return [...new Set(roots.map((p) => path.resolve(p)))];
+  return [
+    { name: 'Cursor (.cursor/skills)', value: path.resolve(process.env.CURSOR_HOME || path.join(home, '.cursor'), 'skills') },
+    { name: 'Codex (.codex/skills)', value: path.resolve(process.env.CODEX_HOME || path.join(home, '.codex'), 'skills') },
+    { name: 'OpenClaw (.openclaw/skills)', value: path.resolve(path.join(home, '.openclaw', 'skills')) },
+    { name: 'Universal / .agents (.agents/skills)', value: path.resolve(path.join(home, '.agents', 'skills')) },
+    { name: 'Claude Code (.claude/skills)', value: path.resolve(path.join(home, '.claude', 'skills')) },
+    { name: 'Continue (.continue/skills)', value: path.resolve(path.join(home, '.continue', 'skills')) },
+    { name: 'Amp (.amp/skills)', value: path.resolve(path.join(home, '.amp', 'skills')) },
+    { name: 'Cline (.cline/skills)', value: path.resolve(path.join(home, '.cline', 'skills')) },
+  ];
+}
+
+/** All known skill roots (for non-interactive / default). */
+function getDefaultSkillRoots() {
+  const choices = getAgentChoices();
+  return [...new Set(choices.map((c) => c.value))];
 }
 
 function parseArgs() {
@@ -60,7 +69,7 @@ function parseArgs() {
     console.error('--skill <name> is required. Example: --skill you-skills');
     process.exit(1);
   }
-  const targetDirs = targetDir ? [targetDir] : getDefaultSkillRoots();
+  const targetDirs = targetDir ? [targetDir] : null;
   return { repoId, owner, repo, skillName, targetDirs, branch, dryRun };
 }
 
@@ -91,7 +100,22 @@ function copyRecursive(src, dest) {
 }
 
 async function main() {
-  const { owner, repo, skillName, targetDirs, branch, dryRun } = parseArgs();
+  const { owner, repo, skillName, targetDirs: targetDirsArg, branch, dryRun } = parseArgs();
+  let targetDirs = targetDirsArg;
+  if (targetDirs === null) {
+    if (process.stdin.isTTY) {
+      const choices = getAgentChoices();
+      const selected = await checkbox({
+        message: 'Which agents do you want to install to?',
+        choices: choices.map((c) => ({ name: c.name, value: c.value, checked: true })),
+        required: true,
+        loop: true,
+      });
+      targetDirs = [...new Set(selected)];
+    } else {
+      targetDirs = getDefaultSkillRoots();
+    }
+  }
   const zipPath = path.join(os.tmpdir(), `skills-${repo}-${Date.now()}.zip`);
   const extractDir = path.join(os.tmpdir(), `skills-${repo}-${Date.now()}`);
 
@@ -126,7 +150,7 @@ async function main() {
       if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
       copyRecursive(skillSrc, skillDest);
     }
-    console.log(`Done. Installed to ${targetDirs.length} location(s) (Cursor, Codex, OpenClaw, .agents).`);
+    console.log(`Done. Installed to ${targetDirs.length} agent location(s).`);
   } finally {
     if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
     if (fs.existsSync(extractDir)) fs.rmSync(extractDir, { recursive: true });

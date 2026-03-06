@@ -10,12 +10,7 @@ npx @goodpostidea-tech/skills add https://github.com/goodpostidea-tech/skills --
 
 - **Repo URL**: Any public GitHub repo that contains skill folders (e.g. this repo).
 - **`--skill`**: Name of the skill folder to install (e.g. `you-skills`).
-- **Target**: By default the skill is installed to **all known roots** so it works in Cursor, Codex, OpenClaw, Claude Code, etc.:
-  - `~/.cursor/skills` (or `$CURSOR_HOME/skills`)
-  - `~/.codex/skills` (or `$CODEX_HOME/skills`)
-  - `~/.openclaw/skills`
-  - `~/.agents/skills`  
-  Use `--target <dir>` to install only to one directory.
+- **Which agents**: When run in a terminal (TTY), you are prompted **"Which agents do you want to install to?"** with a checkbox list (Cursor, Codex, OpenClaw, .agents, Claude Code, Continue, Amp, Cline). Use ↑↓ to move, Space to toggle, Enter to confirm. By default all are selected. Use `--target <dir>` to skip the prompt and install only to one directory.
 - **Branch**: Default is `main`. Use `--branch master` (or other) if the repo uses another default branch.
 - **Dry run**: Add `--dry-run` to print what would be done without copying.
 

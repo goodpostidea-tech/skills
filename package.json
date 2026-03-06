@@ -1,6 +1,6 @@
 {
   "name": "@goodpostidea-tech/skills",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Install skills from a GitHub repo into your local skills directory",
   "type": "module",
   "bin": {
@@ -24,6 +24,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.2.0",
     "extract-zip": "^2.0.1"
   }
 }
