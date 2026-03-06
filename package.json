@@ -1,0 +1,29 @@
+{
+  "name": "@goodpostidea-tech/skills",
+  "version": "0.1.0",
+  "description": "Install skills from a GitHub repo into your local skills directory",
+  "type": "module",
+  "bin": {
+    "skills": "./cli.js"
+  },
+  "scripts": {
+    "test": "node cli.js add https://github.com/goodpostidea-tech/skills --skill you-skills --dry-run"
+  },
+  "keywords": [
+    "skills",
+    "cursor",
+    "codex",
+    "install"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goodpostidea-tech/skills.git"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1"
+  }
+}
