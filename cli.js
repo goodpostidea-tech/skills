@@ -2,7 +2,8 @@
 
 /**
  * skills add <repo-url> [--skill <name>] [--target <dir>] [--dry-run]
- * Install a skill from a GitHub repo into the local skills directory.
+ * Install a skill into local skills directories. By default installs to all
+ * known roots (Cursor, Codex, OpenClaw, .agents) so the skill works in any tool.
  */
 
 import fs from 'node:fs';
@@ -10,10 +11,20 @@ import path from 'node:path';
 import os from 'node:os';
 import extract from 'extract-zip';
 
-const DEFAULT_TARGET = process.env.CURSOR_HOME
-  ? path.join(process.env.CURSOR_HOME, 'skills')
-  : path.join(os.homedir(), '.cursor', 'skills');
 const DEFAULT_BRANCH = 'main';
+
+/** All known skill roots so the skill works in Cursor, Codex, OpenClaw, Claude Code, etc. */
+function getDefaultSkillRoots() {
+  const home = os.homedir();
+  const roots = [];
+  const codexHome = process.env.CODEX_HOME || path.join(home, '.codex');
+  roots.push(path.join(codexHome, 'skills'));
+  const cursorHome = process.env.CURSOR_HOME || path.join(home, '.cursor');
+  roots.push(path.join(cursorHome, 'skills'));
+  roots.push(path.join(home, '.openclaw', 'skills'));
+  roots.push(path.join(home, '.agents', 'skills'));
+  return [...new Set(roots.map((p) => path.resolve(p)))];
+}
 
 function parseArgs() {
   const args = process.argv.slice(2);
@@ -24,7 +35,7 @@ function parseArgs() {
   }
   const repoUrl = args[1];
   let skillName = null;
-  let targetDir = DEFAULT_TARGET;
+  let targetDir = null;
   let dryRun = false;
   let branch = DEFAULT_BRANCH;
   for (let i = 2; i < args.length; i++) {
@@ -49,7 +60,8 @@ function parseArgs() {
     console.error('--skill <name> is required. Example: --skill you-skills');
     process.exit(1);
   }
-  return { repoId, owner, repo, skillName, targetDir, branch, dryRun };
+  const targetDirs = targetDir ? [targetDir] : getDefaultSkillRoots();
+  return { repoId, owner, repo, skillName, targetDirs, branch, dryRun };
 }
 
 async function downloadZip(owner, repo, branch, destPath) {
@@ -79,11 +91,12 @@ function copyRecursive(src, dest) {
 }
 
 async function main() {
-  const { owner, repo, skillName, targetDir, branch, dryRun } = parseArgs();
+  const { owner, repo, skillName, targetDirs, branch, dryRun } = parseArgs();
   const zipPath = path.join(os.tmpdir(), `skills-${repo}-${Date.now()}.zip`);
   const extractDir = path.join(os.tmpdir(), `skills-${repo}-${Date.now()}`);
 
-  console.log(`Adding skill "${skillName}" from ${owner}/${repo} (${branch}) -> ${targetDir}/${skillName}`);
+  console.log(`Adding skill "${skillName}" from ${owner}/${repo} (${branch})`);
+  targetDirs.forEach((d) => console.log(`  -> ${path.join(d, skillName)}`));
 
   if (dryRun) {
     console.log('[dry-run] Skipping download and copy.');
@@ -108,10 +121,12 @@ async function main() {
       const atRoot = fs.readdirSync(root).filter((n) => n !== 'skills').join(', ');
       throw new Error(`Skill "${skillName}" not found. Under skills/: ${inSkills}. At root: ${atRoot}`);
     }
-    const skillDest = path.join(targetDir, skillName);
-    if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    copyRecursive(skillSrc, skillDest);
-    console.log(`Done. Installed to ${skillDest}`);
+    for (const targetDir of targetDirs) {
+      const skillDest = path.join(targetDir, skillName);
+      if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+      copyRecursive(skillSrc, skillDest);
+    }
+    console.log(`Done. Installed to ${targetDirs.length} location(s) (Cursor, Codex, OpenClaw, .agents).`);
   } finally {
     if (fs.existsSync(zipPath)) fs.unlinkSync(zipPath);
     if (fs.existsSync(extractDir)) fs.rmSync(extractDir, { recursive: true });

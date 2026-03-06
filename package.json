@@ -1,6 +1,6 @@
 {
   "name": "@goodpostidea-tech/skills",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Install skills from a GitHub repo into your local skills directory",
   "type": "module",
   "bin": {
