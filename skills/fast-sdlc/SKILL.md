@@ -1,193 +1,360 @@
 ---
 name: fast-sdlc
 description: |
-  Fully automated Software Development Life Cycle (SDLC) accelerator for web applications. The user only needs to describe a product idea or feature request; the agent should automatically infer a suitable tech stack, then complete all four SDLC stages and output one structured Markdown document per stage.
-  
-  Language: respond in the user's language when possible. This skill description is written in **English with Chinese notes**, but you should freely handle both English and Chinese user queries.
+  Fully automated Software Development Life Cycle (SDLC) accelerator for software projects (web apps, APIs, mobile apps, and microservices). The user only needs to describe a product idea or feature request; the agent automatically infers a suitable tech stack, then completes all five SDLC stages and outputs one structured Markdown document per stage.
+
+  **Language rule**: Detect the language of the user's input and generate ALL output documents in that same language. For example, if the user writes in Chinese, all 5 stage documents must be written in Chinese. If the user writes in English, output in English. The skill definition itself is in English, but output language always follows the user.
 
   When to trigger this skill (if ANY of the following is true, use it immediately):
-  - User says: “Help me plan/design/develop a [product/feature/system]”
-  - User says: “Build an app from scratch…”, “I have an idea…”, “Make a web application…”
+  - User says: "Help me plan/design/develop a [product/feature/system]"
+  - User says: "Build an app from scratch…", "I have an idea…", "Make a web application…"
   - User mentions SDLC, software development lifecycle, product planning, technical design
-  - User explicitly asks for PRD, system architecture, implementation plan, or test cases (any subset)
-  - Any task that spans **from requirements to code** for a web project, even if the user does not say “SDLC”
+  - User explicitly asks for PRD, system architecture, implementation plan, test cases, or deployment guide (any subset)
+  - Any task that spans **from requirements to code** for a web project, even if the user does not say "SDLC"
 ---
 
 # Fast SDLC — Fully Automated Software Development Lifecycle
 
-> 简体中文说明：  
-> Fast SDLC 是一个**全自动的软件开发生命周期加速器**，针对 Web 应用项目。用户只需描述一个产品想法或功能需求，Agent 会自动推断技术栈，并依次完成 4 个阶段（PRD / 架构 / 实现方案 / 测试），每个阶段输出一份独立的 Markdown 文档。
+## Overview
 
-## Overview / 概述
+After receiving the user's product/feature description, **do NOT ask clarifying questions first** (unless the user explicitly requests interactive mode).
+Instead, immediately execute all five stages below and produce **one separate `.md` file per stage**. Present all files together so the user can review them.
 
-After receiving the user's product/feature description, **do NOT ask clarifying questions first**.  
-Instead, immediately execute all four stages below, and produce **one separate `.md` file per stage**. In the end, present all four files together so the user can review or download them.
+### Partial Execution
+
+If the user only requests specific stages (e.g., "just give me a PRD", "I need architecture and implementation"), generate **only the requested stages**. Skip unrequested stages but still run Step 0 internally for consistency. Use the same file naming convention for whichever stages are generated.
+
+### Interactive Mode
+
+If the user requests review before proceeding (e.g., "let me review first", "confirm before continuing"), pause after Step 0 and present the inferred project type, recommended tech stack, MVP scope, and entity glossary. Wait for user confirmation before generating stage documents.
 
 ---
 
-## Execution flow / 执行流程
+## Execution Flow
 
-### Step 0 — Fast reasoning (internal only, no direct output) / 第 0 步：快速推断（不输出，只在脑中执行）
+### Step 0 — Fast Reasoning (internal, no direct output)
 
-Before you start generating any files, reason internally about:
+Before generating any files, reason internally about:
 
-1. **Project type** — SaaS, tool site, content platform, e‑commerce, admin panel, or something else?
-2. **Candidate tech stacks** — based on complexity and common practice, list 2–3 candidates (see `references/tech-stacks.md`)
+1. **Project type** — SaaS, tool site, content platform, e-commerce, admin panel, or something else?
+2. **Candidate tech stacks** — based on complexity, team size, performance needs, and common practice, list 2–3 candidates from the 5 categories in `references/tech-stacks.md` (JS/TS full-stack, Python backend, Go backend, Java/Kotlin backend, microservices)
 3. **Core entities** — the 3–5 most important entities in the data model
-4. **MVP scope** — which features are MVP, which can be postponed to V2
+4. **MVP scope** — which features are MVP, which can be deferred to V2
+5. **Glossary** — define a consistent naming table for core entities, features, and API paths. All subsequent stages MUST use these exact names.
 
-After this internal reasoning, **start generating the stage documents directly**.  
+After this reasoning, **start generating the stage documents directly** (unless in interactive mode).
 At the top of the first document, briefly state your inferred project type and recommended stack in one sentence.
 
 ---
 
-### Stage 1 — Requirements & PRD (output file: `01-PRD.md`) / 阶段 1：需求分析 & PRD
+### Stage 1 — Requirements & PRD (output: `01-PRD.md`)
 
 Follow `references/prd-template.md` and produce a PRD containing at least:
 
 ```
-# [项目名称] — 产品需求文档 (PRD)
+# [Project Name] — Product Requirements Document (PRD)
 
-## 项目背景与目标
-- 一句话描述
-- 核心价值主张
-- 成功指标（可量化）
+## Background & Objectives
+- One-sentence description
+- Core value proposition
+- Success metrics (quantifiable)
+- Business model / monetization strategy (if applicable)
 
-## 用户角色 (Personas)
-| 角色 | 描述 | 核心诉求 |
-|------|------|----------|
-| ...  | ...  | ...      |
+## Competitive Analysis
+| Competitor | Strengths | Weaknesses | Our Differentiation |
+|------------|-----------|------------|---------------------|
+| ...        | ...       | ...        | ...                 |
 
-## 功能需求（用户故事格式）
-### MVP 功能
-- 作为 [角色]，我希望 [功能]，以便 [价值]
-### V2 功能（暂不实现）
+## User Personas
+| Persona | Description | Core Need |
+|---------|-------------|-----------|
+| ...     | ...         | ...       |
+
+## User Journey Map
+- End-to-end flow diagram (Mermaid flowchart) for each primary persona
+- Key touchpoints, decision points, and pain points
+
+## Functional Requirements (User Story Format)
+### MVP Features (prioritized)
+Priority levels: P0 (must-have) / P1 (should-have) / P2 (nice-to-have)
+- [P0] As a [persona], I want [feature], so that [value]. Acceptance criteria: [conditions]
+### V2 Features (deferred)
 - ...
 
-## 非功能需求
-- 性能：...
-- 安全：...
-- 兼容性：...
+## Non-Functional Requirements
+- Performance: ...
+- Security: ...
+- Accessibility: WCAG 2.1 AA compliance targets
+- Compatibility: ...
 
-## 约束与假设
-## 里程碑计划
+## Risk Assessment
+| Risk | Impact | Probability | Mitigation |
+|------|--------|-------------|------------|
+| ...  | H/M/L  | H/M/L       | ...        |
+
+## Constraints & Assumptions
+
+## Milestone Plan
+| Milestone | Scope | Owner / Role | Estimated Duration |
+|-----------|-------|--------------|--------------------|
+(Duration should scale with project complexity — do NOT use fixed defaults)
 ```
 
 ---
 
-### Stage 2 — System design & architecture (output file: `02-Architecture.md`) / 阶段 2：系统设计 & 架构
+### Stage 2 — System Design & Architecture (output: `02-Architecture.md`)
 
 Use `references/tech-stacks.md` as guidance and generate:
 
 ```
-# [项目名称] — 系统架构设计
+# [Project Name] — System Architecture
 
-## 技术栈决策
-### 推荐方案（附理由）
-| 层次 | 技术选型 | 备选方案 | 选择理由 |
-|------|---------|---------|---------|
+## Tech Stack Decision
+### Recommended Stack (with rationale)
+| Layer    | Technology | Alternative | Rationale |
+|----------|-----------|-------------|-----------|
 
-### 技术栈对比（当有多个可行方案时展示）
+### Stack Comparison (when multiple options are viable)
 ...
 
-## 系统架构图（Mermaid）
-- 整体架构图（前端、后端、数据库、外部服务）
+## System Architecture Diagram (Mermaid)
+- Overall architecture (frontend, backend, database, external services)
 
-## 数据模型
-- 核心实体 ER 图（Mermaid）
-- 每个实体的主要字段
+## Data Model
+- Core entity ER diagram (Mermaid)
+- Key fields for each entity
 
-## API 设计（RESTful / GraphQL）
-- 核心接口列表（方法、路径、说明）
+## API Design (RESTful / GraphQL / gRPC)
+- Versioning strategy (URL path `/v1/`, header, or query param)
+- Core endpoint list (method, path, description)
+- Authentication & authorization flow diagram (Mermaid sequence diagram)
+- RBAC / permission model (if applicable)
 
-## 目录结构
-- 推荐的项目目录树
+## Directory Structure
+- Recommended project directory tree
 
-## 部署架构
-- 开发环境
-- 生产环境建议
+## Deployment Architecture
+- Development environment
+- Production environment recommendations
+- Network topology (VPC, subnets, firewall rules — if applicable)
 ```
 
 ---
 
-### Stage 3 — Implementation blueprint (output file: `03-Implementation.md`) / 阶段 3：代码实现方案
+### Stage 3 — Implementation Blueprint (output: `03-Implementation.md`)
 
-**Important**: do **NOT** generate a full, production‑ready codebase here.  
-Instead, create an **implementation blueprint** — key code skeletons + guidance so that a developer (or another agent) can quickly implement the project.
+**Important**: do **NOT** generate a full production-ready codebase.
+Create an **implementation blueprint** — key code skeletons, file-level task list, and integration guidance so that a developer or coding agent can quickly implement the project.
 
 ```
-# [项目名称] — 代码实现方案
+# [Project Name] — Implementation Blueprint
 
-## 项目初始化
-- 脚手架命令
-- 依赖安装清单
+## Project Initialization
+- Scaffold commands
+- Dependency install list
 
-## 核心模块实现
-为每个核心模块提供：
-- 模块职责
-- 关键代码片段（骨架/示例，非完整实现）
-- 注意事项 / 常见坑
+## File-Level Task Checklist
+Ordered list of files to create/modify, each with:
+- File path
+- Responsibility
+- Key implementation notes
+- Dependencies on other files
 
-## 状态管理方案（前端）
-## 认证方案
-## 数据库 Schema（SQL 或 ODM 定义）
-## 环境变量清单（.env.example）
-## 开发启动指南
+## Core Module Implementation
+For each core module, provide:
+- Module responsibility
+- Key code snippets (skeleton/example, not full implementation)
+- Gotchas and common pitfalls
+
+## State Management (frontend)
+
+## Authentication Flow
+- Auth strategy (session-based / JWT / OAuth2) with rationale
+- Token refresh & session invalidation logic
+- RBAC vs ABAC model and permission definitions
+
+## Database Schema (SQL or ODM definitions)
+- Migration tooling and workflow (e.g., Drizzle Kit, Prisma Migrate, Alembic, Flyway)
+- Seed data / fixture scripts for development
+
+## Error Handling & Logging Strategy
+- Global error handler pattern (backend + frontend error boundaries)
+- Structured logging format (JSON logs with correlation IDs)
+- Error classification (client errors vs server errors vs infrastructure)
+
+## Code Quality Tooling
+- Linter & formatter config (ESLint/Biome, Prettier, Ruff, golangci-lint, etc.)
+- Git hooks (Husky + lint-staged / pre-commit)
+- PR template and code review checklist
+
+## Third-Party Integration Guide
+- Authentication providers (OAuth, SSO)
+- Payment processing (Stripe, etc.)
+- Email/notification services
+- File storage (S3, Cloudflare R2, etc.)
+
+## Environment Variables (`.env.example`)
+## Development Startup Guide
+
+## Agent Execution Prompt
+> A ready-to-use prompt that can be fed to a coding agent to implement
+> this blueprint. Summarize the tech stack, directory structure, and
+> ordered task list in a single actionable instruction block.
 ```
 
 ---
 
-### Stage 4 — Test cases & QA (output file: `04-QA.md`) / 阶段 4：测试用例 & QA
+### Stage 4 — Test Cases & QA (output: `04-QA.md`)
 
 ```
-# [项目名称] — 测试方案
+# [Project Name] — Test Plan
 
-## 测试策略概览
-- 测试金字塔：单元 / 集成 / E2E 比例建议
+## Test Strategy Overview
+- Test pyramid: recommended unit / integration / E2E ratio
+- Coverage targets (e.g., unit > 80%, integration > 60%)
+- CI integration: which tests run on PR, which on merge, which nightly
 
-## 单元测试用例
-| 模块 | 测试场景 | 输入 | 预期输出 | 优先级 |
-|------|---------|------|---------|--------|
+## Test Data Strategy
+- Seed data / fixtures / factory approach
+- Test database setup and teardown workflow
+- Sensitive data handling in test environments
 
-## 集成测试用例（API 层）
-| 接口 | 场景 | 请求 | 预期响应 |
-|------|------|------|---------|
+## Unit Test Cases
+| Module | Scenario | Input | Expected Output | Priority |
+|--------|----------|-------|----------------|----------|
 
-## E2E 测试用例（关键用户旅程）
-- 场景描述（Gherkin 格式）
+## Integration Test Cases (API layer)
+| Endpoint | Scenario | Request | Expected Response |
+|----------|----------|---------|-------------------|
 
-## 边界条件 & 异常场景
-## 性能测试建议
-## 测试工具推荐（匹配技术栈）
+## E2E Test Cases (critical user journeys)
+- Scenario descriptions (Gherkin format)
+
+## Security Testing
+- OWASP Top 10 checklist (XSS, CSRF, SQL injection, broken auth, etc.)
+- Dependency vulnerability scanning (npm audit, Snyk, Trivy)
+- Recommended penetration testing scope
+
+## Accessibility Testing
+- WCAG 2.1 AA compliance checks
+- Tooling: axe-core, Lighthouse accessibility audit, screen reader testing
+
+## Boundary Conditions & Error Scenarios
+## Performance Test Recommendations
+## Recommended Testing Tools (matching the tech stack)
+
+> Note: For CI test integration details, see Stage 5 — CI/CD Pipeline section.
 ```
 
 ---
 
-## Output conventions / 输出规范
+### Stage 5 — Deployment & Operations (output: `05-Deployment.md`)
 
+```
+# [Project Name] — Deployment & Operations Guide
+
+## Containerization
+- Dockerfile (multi-stage build)
+- docker-compose.yml (dev and prod profiles)
+
+## Infrastructure as Code (if applicable)
+- IaC tooling: Terraform / Pulumi / AWS CDK / SST
+- Resource definitions (compute, database, networking, DNS)
+- Environment provisioning workflow
+
+## CI/CD Pipeline
+- GitHub Actions workflow (or equivalent)
+- Build → lint → test → deploy stages
+- Test integration: run test suites defined in Stage 4 (unit on PR, integration on merge, E2E nightly)
+- Deployment strategy: blue-green / canary / rolling update
+
+## Rollback Strategy
+- How to roll back a failed deployment (automated vs manual)
+- Database migration rollback approach
+- Feature flags for gradual rollout (if applicable)
+
+## Environment Management
+- Environment variable inventory (dev / staging / prod)
+- Secrets management: specific tooling (e.g., Vault, AWS Secrets Manager, Doppler, SOPS, .env.vault)
+
+## Network & Security Architecture
+- VPC / subnet layout (if cloud-hosted)
+- WAF / DDoS protection
+- Firewall rules and ingress/egress policies
+- SSL certificate management (Let's Encrypt / ACM / Cloudflare)
+
+## Observability Stack
+- Logging: tool recommendations matching tech stack (e.g., Pino/Winston for Node.js, Loguru for Python, Zap for Go)
+- Metrics: Prometheus + Grafana / Datadog / CloudWatch
+- Tracing: OpenTelemetry + Jaeger / Zipkin
+- Error tracking: Sentry / Bugsnag
+- Uptime monitoring: Uptime Kuma / Better Stack / Pingdom
+
+## Database Operations
+- Connection pooling strategy (PgBouncer, built-in pool, HikariCP)
+- Backup schedule and retention policy
+- Read replica configuration (if applicable)
+- Migration deployment workflow (how to run migrations in production safely)
+
+## Production Checklist
+- [ ] HTTPS / TLS configured
+- [ ] Database backups scheduled and tested
+- [ ] Error tracking integrated
+- [ ] Structured logging enabled
+- [ ] Rate limiting & CORS configured
+- [ ] Health check endpoint implemented (`/healthz`)
+- [ ] Rollback procedure tested
+- [ ] Security headers configured (CSP, HSTS, X-Frame-Options)
+- [ ] Dependency vulnerability scanning in CI
+
+## Scaling Considerations
+- Horizontal scaling strategy
+- Caching layer recommendations (Redis, CDN, application-level)
+- CDN configuration
+- Auto-scaling policies (if applicable)
+```
+
+---
+
+## Output Conventions
+
+0. **Language**: All output documents MUST be written in the same language as the user's input. Detect the user's language automatically. Document file names remain in English (e.g., `01-PRD.md`), but all content inside follows the user's language.
 1. **One file per stage** named exactly:
    - `01-PRD.md`
    - `02-Architecture.md`
    - `03-Implementation.md`
    - `04-QA.md`
-2. Save all files under: `/mnt/user-data/outputs/[project-name]-sdlc/`
-3. Use the `present_files` tool to present all 4 files to the user at once.
-4. Finally, write a short **execution summary** for the user:
+   - `05-Deployment.md`
+2. Save all files under: `./[project-name]-sdlc/` in the current working directory.
+3. After generating all files, list the file paths and write a short **execution summary**:
    - Inferred tech stack (1–2 sentences)
    - 3 core MVP features (bullet list)
-   - Rough complexity estimate (e.g. “suitable for a 2–3 person team, 3–4 weeks of work”)
+   - Rough complexity estimate (e.g., "suitable for a 2–3 person team, 3–4 weeks")
+   - Top 1–2 risks from the risk assessment and their mitigations
 
-## Quality checklist / 质量检查清单
+## Quality Checklist
 
-Before finishing, quickly self‑check:
+Before finishing, self-check:
 - [ ] PRD contains at least one **quantifiable** success metric
+- [ ] PRD includes competitive analysis and user journey map
+- [ ] MVP features have priority labels (P0/P1/P2)
+- [ ] PRD includes a risk assessment table
 - [ ] Architecture file includes at least one Mermaid diagram
-- [ ] Tech stack comparison table has ≥ 2 options when multiple stacks are viable
+- [ ] Architecture specifies API versioning strategy
+- [ ] Tech stack comparison table has >= 2 options when multiple stacks are viable
 - [ ] Every API endpoint listed has a brief description
+- [ ] Implementation blueprint includes error handling, logging, and code quality sections
+- [ ] Database migration tooling is specified
 - [ ] Test cases cover the happy path and at least **3** edge/error scenarios
-- [ ] Naming is consistent across all docs (entities, API paths, feature names, etc.)
+- [ ] QA includes security testing (OWASP) and accessibility testing sections
+- [ ] Test coverage targets are defined
+- [ ] Deployment guide includes rollback strategy and observability stack
+- [ ] Secrets management specifies concrete tools
+- [ ] **Naming is consistent** across all 5 documents — verify against the Step 0 glossary
+- [ ] No hardcoded environment-specific paths in any document
+- [ ] Deployment guide matches the tech stack chosen in Stage 2
 
-## Reference files / 参考文件
+## Reference Files
 
-- `references/tech-stacks.md` — common web stacks, characteristics, and suitable scenarios  
-- `references/prd-template.md` — detailed PRD template and writing guidelines
+- `references/tech-stacks.md` — common web stacks, characteristics, and suitable scenarios
+- `references/prd-template.md` — PRD template and writing guidelines

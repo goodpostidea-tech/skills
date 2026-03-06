@@ -1,52 +1,136 @@
-# PRD 模板填写指南
+# PRD Template & Writing Guide
 
-## 成功指标示例（要可量化）
+## Success Metrics (must be quantifiable)
 
-❌ 差："用户喜欢这个功能"  
-✅ 好："上线 30 天内 DAU 达到 500，用户平均会话时长 > 3 分钟"
+**Bad**: "Users like this feature"
+**Good**: "DAU reaches 500 within 30 days of launch, average session duration > 3 minutes"
 
-常见指标模板：
-- **用户增长**：注册用户数、MAU/DAU
-- **参与度**：会话时长、关键功能使用率
-- **转化**：注册→付费转化率、漏斗完成率
-- **性能**：核心页面 LCP < 2.5s，API P99 < 500ms
-- **质量**：错误率 < 0.1%，客诉率 < 1%
-
----
-
-## 用户故事质量标准（INVEST）
-
-- **Independent**：故事间尽量独立，可单独交付
-- **Negotiable**：描述"什么"而非"怎么做"
-- **Valuable**：每条故事对用户有明确价值
-- **Estimable**：足够具体，可以估时
-- **Small**：一个 sprint 内可完成
-- **Testable**：有明确的验收标准
-
-格式：`作为 [角色]，我希望 [功能]，以便 [价值]。验收标准：[具体条件]`
+Common metric templates:
+- **User growth**: Registered users, MAU/DAU
+- **Engagement**: Session duration, key feature usage rate
+- **Conversion**: Registration → paid conversion rate, funnel completion rate
+- **Performance**: Core page LCP < 2.5s, API P99 < 500ms
+- **Quality**: Error rate < 0.1%, support ticket rate < 1%
 
 ---
 
-## MVP 范围划定原则
+## Competitive Analysis Guide
 
-**纳入 MVP**：
-- 验证核心假设必需的功能
-- 用户完成主要任务流程的最小路径
-- 没有它用户根本无法使用产品的功能
+Analyze 2–4 direct or indirect competitors:
 
-**推迟到 V2**：
-- 优化体验但不影响核心流程（通知、推荐等）
-- 管理员功能、高级分析
-- 社交/分享功能
-- 移动端优化（如果首要平台是 Web）
+| Competitor | Product Positioning | Key Features | Strengths | Weaknesses | Our Differentiation |
+|------------|---------------------|--------------|-----------|------------|---------------------|
+
+Tips:
+- Focus on **direct competitors** (same market) and **indirect competitors** (alternative solutions)
+- Identify gaps in competitor offerings that your product can fill
+- Be honest about where competitors are stronger — this informs risk assessment
 
 ---
 
-## 里程碑模板
+## User Story Quality Standards (INVEST)
 
-| 里程碑 | 内容 | 预估时间 |
-|--------|------|---------|
-| M0 基础设施 | 项目初始化、CI/CD、数据库 schema | 1 周 |
-| M1 核心功能 | MVP 主流程功能开发 | 2-3 周 |
-| M2 完善与测试 | 异常处理、测试、UI 打磨 | 1 周 |
-| M3 上线 | 部署、监控、内测 | 3 天 |
+- **Independent**: Stories should be as independent as possible, deliverable on their own
+- **Negotiable**: Describe "what", not "how"
+- **Valuable**: Each story has clear value to the user
+- **Estimable**: Specific enough to estimate effort
+- **Small**: Completable within one sprint
+- **Testable**: Has clear acceptance criteria
+
+Format: `As a [persona], I want [feature], so that [value]. Acceptance criteria: [specific conditions]`
+
+---
+
+## Feature Priority Classification
+
+Use priority labels to communicate importance:
+
+| Priority | Meaning | Guideline |
+|----------|---------|-----------|
+| **P0** (Must-have) | Product is unusable without it | Core hypothesis validation, critical user path |
+| **P1** (Should-have) | Important but product can launch without it | Significant UX improvement, secondary flows |
+| **P2** (Nice-to-have) | Enhances experience, low urgency | Polish, optimization, convenience features |
+| **V2** (Deferred) | Explicitly out of MVP scope | Future roadmap items |
+
+---
+
+## User Journey Map Guide
+
+Create a Mermaid flowchart for each primary persona's end-to-end experience:
+
+```
+flowchart LR
+    A[Landing Page] --> B{Has Account?}
+    B -- Yes --> C[Login]
+    B -- No --> D[Sign Up]
+    C --> E[Dashboard]
+    D --> E
+    E --> F[Core Action]
+    F --> G[Success State]
+```
+
+Identify at each step:
+- **Touchpoint**: What the user sees / interacts with
+- **Decision point**: Where the user makes a choice
+- **Pain point**: Where friction or drop-off is likely
+- **Opportunity**: Where the product can delight
+
+---
+
+## MVP Scope Guidelines
+
+**Include in MVP**:
+- Features essential to validate the core hypothesis
+- Minimum path for users to complete the primary task flow
+- Features without which the product is unusable
+
+**Defer to V2**:
+- Experience enhancements that don't affect core flow (notifications, recommendations)
+- Admin features, advanced analytics
+- Social/sharing features
+- Mobile optimization (if primary platform is web)
+
+---
+
+## Risk Assessment Guide
+
+Identify 3–5 key risks across these categories:
+
+| Category | Example Risks |
+|----------|---------------|
+| **Technical** | Third-party API reliability, performance at scale, data migration complexity |
+| **Product** | Low user adoption, feature misalignment with market, poor retention |
+| **Resource** | Team availability, skill gaps, budget constraints |
+| **Timeline** | Scope creep, dependency delays, underestimated complexity |
+| **Compliance** | Data privacy (GDPR/CCPA), accessibility requirements, industry regulations |
+
+Rate each risk:
+- **Impact**: High / Medium / Low
+- **Probability**: High / Medium / Low
+- **Mitigation**: Concrete action to reduce the risk
+
+---
+
+## Milestone Template
+
+| Milestone | Scope | Owner / Role | Estimated Duration |
+|-----------|-------|--------------|--------------------|
+| M0 — Infrastructure | Project setup, CI/CD, database schema | Tech Lead | Scale with complexity |
+| M1 — Core Features | MVP main flow (P0 features) | Full Team | Scale with complexity |
+| M2 — Polish & Testing | Error handling, testing, UI refinement, P1 features | Full Team | Scale with complexity |
+| M3 — Launch | Deployment, monitoring, beta testing | DevOps + PM | Scale with complexity |
+
+**Duration scaling guidance**:
+- Solo dev / simple app: M0 (2–3 days), M1 (1–2 weeks), M2 (3–5 days), M3 (1–2 days)
+- Small team (2–3) / medium app: M0 (1 week), M1 (2–3 weeks), M2 (1 week), M3 (3 days)
+- Larger team (4+) / complex app: M0 (1–2 weeks), M1 (4–6 weeks), M2 (2 weeks), M3 (1 week)
+
+---
+
+## Business Model Section Guide (if applicable)
+
+Consider including:
+- **Revenue model**: Subscription (SaaS), freemium, one-time purchase, transaction fee, advertising
+- **Pricing tiers**: Free / Pro / Enterprise with feature breakdown
+- **Cost structure**: Infrastructure, third-party services, team costs
+- **Unit economics**: CAC (customer acquisition cost), LTV (lifetime value), payback period
