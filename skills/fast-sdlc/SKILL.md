@@ -1,3 +1,4 @@
+---
 name: fast-sdlc
 description: |
   Fully automated Software Development Life Cycle (SDLC) accelerator for web applications. The user only needs to describe a product idea or feature request; the agent should automatically infer a suitable tech stack, then complete all four SDLC stages and output one structured Markdown document per stage.
